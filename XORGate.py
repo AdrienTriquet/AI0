@@ -7,16 +7,22 @@ def sigmoid(n):
     # Define the sigmoid function as activation function
     return 1.0/(1.0 + np.exp(-n))
 
+def unit_step_activation(n):
+    return (n >= 0) * 1
+
 #############################################################################################################################################################################################################
 #############################################################################################################################################################################################################
 
 def hyperbolic_tan(n):
-    return ( (np.exp(n) - np.exp(-n)) / (np.exp(n) - np.exp(-n)) )
+    #return ( (np.exp(n) - np.exp(-n)) / (np.exp(n) + np.exp(-n)) )
+    return (2 / (1 + np.exp(-2*n)) - 1)
 
 #############################################################################################################################################################################################################
 #############################################################################################################################################################################################################
+def unit_derivative():
+    return 0
+
 def sigmoidDerivative(n):
-
     return n*(1-n)
 #############################################################################################################################################################################################################
 #############################################################################################################################################################################################################
@@ -28,14 +34,15 @@ def tanhDerivative(n):
 #############################################################################################################################################################################################################
 def forwardPropagationLayer(p, weights, biases):
 
-    a = None  # the layer output
+    #a = None  # the layer output
 
     # Multiply weights with the input vector (p) and add the bias   =>  n
     n = np.dot(p, weights) + biases
 
     # Pass the result to the activation function  =>  a
-    a = sigmoid(n)
-    #a = hyperbolic_tan(n)
+    #a = unit_step_activation(n)
+    #a = sigmoid(n)
+    a = hyperbolic_tan(n)
 
     return a
 #############################################################################################################################################################################################################
@@ -45,7 +52,6 @@ def erreur(out, pred):
     N = 4
     N2 = 2 * N
     sum = 0
-    #print(float(out), float(pred))
     for i in range(N):
         sum += (float(out[i]) - float(pred[i]))**2
         print(sum)
@@ -95,12 +101,14 @@ def main():
 
         # Backpropagation
         bkProp_error = labels - predicted_output
-        d_predicted_output = bkProp_error * sigmoidDerivative(predicted_output)
-        #d_predicted_output = bkProp_error * tanhDerivative(predicted_output)
+        #d_predicted_output = bkProp_error * unit_derivative()
+        #d_predicted_output = bkProp_error * sigmoidDerivative(predicted_output)
+        d_predicted_output = bkProp_error * tanhDerivative(predicted_output)
 
         error_hidden_layer = d_predicted_output.dot(weightsLayer2.T)
-        d_hidden_layer = error_hidden_layer * sigmoidDerivative(hidden_layer_output)
-        #d_hidden_layer = error_hidden_layer * tanhDerivative(hidden_layer_output)
+        #d_hidden_layer = error_hidden_layer * unit_derivative()
+        #d_hidden_layer = error_hidden_layer * sigmoidDerivative(hidden_layer_output)
+        d_hidden_layer = error_hidden_layer * tanhDerivative(hidden_layer_output)
 
 
         # Updating Weights and Biases
